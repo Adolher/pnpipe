@@ -1,4 +1,6 @@
 import os
+import json
+import csv
 
 
 class NothingFoundError(Exception):
@@ -91,3 +93,54 @@ def shrink(dictionary):
         shrunk_dict = {}
         shrunk_dict = merge(dictionary, shrunk, shrunk_dict)
         return shrunk_dict
+
+
+def get_json(path, pattern):
+    if not pattern.endswith(".json"):
+        pattern += ".json"
+    try:
+        with open(os.path.join(path, pattern)) as json_file:
+            content = json.load(json_file)
+            return content
+    except FileNotFoundError:
+        return
+
+
+def get_tsv(path, pattern):
+    content = {}
+    if not pattern.endswith(".tsv"):
+        pattern += ".tsv"
+    try:
+        with open(os.path.join(path, pattern)) as tsv_file:
+            y = csv.DictReader(tsv_file, delimiter="\t")
+            for x in y:
+                keys = list(x.keys())
+                content[x.pop(keys[0])] = x
+            return content
+    except FileNotFoundError:
+        return
+
+
+def get_tsv_or_json(path, pattern):
+    content = get_tsv(path, pattern) if os.path.exists(os.path.join(path, pattern + ".tsv"))\
+        else get_json(path, pattern + ".json")
+    return content
+
+
+def get_txt(path, *pattern):
+    content = None
+    for p in pattern:
+        try:
+            with open(os.path.join(path, p)) as txt_file:
+                content = txt_file.read()
+                return content
+        except FileNotFoundError:
+            p += ".txt"
+            try:
+                with open(os.path.join(path, p)) as txt_file:
+                    content = txt_file.read()
+                    return content
+            except FileNotFoundError:
+                pass
+    if content is None:
+        return content

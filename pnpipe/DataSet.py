@@ -5,13 +5,42 @@ import utils
 
 class Dataset:
     def __init__(self, pattern):
-        self.not_to_shrink = ["ses-", ]
+        self.dataset_path = utils.get_path(pattern)
+        self.dataset_description = utils.get_json(self.dataset_path, "dataset_description")
+        self.raedme = utils.get_txt(self.dataset_path, "readme", "Readme", "README")
+        self.changes = utils.get_txt(self.dataset_path, "changes", "Changes", "CHANGES")
+        self.license = utils.get_txt(self.dataset_path, "license", "License", "LICENSE")
+        self.participants = utils.get_tsv_or_json(self.dataset_path, "participants")
+        self.samples_tsv = utils.get_tsv(self.dataset_path, "samples")      # ToDo: merge samples in 1 dict
+        self.samples_json = utils.get_json(self.dataset_path, "samples")
+        self.subjects = None
 
         self.is_bids = False
-        self.dataset_path = utils.get_path(pattern)
+
+        self.not_to_shrink = ["ses-", ]
         self.dataset_overview, self.full_dataset = \
             self._prepare_dataset_overview(os.scandir(self.dataset_path), {}, {})
-        self.subjects = []
+
+    def get_dataset_path(self):
+        return self.dataset_path
+
+    def get_dataset_description(self):
+        return self.dataset_description
+
+    def get_readme(self):
+        return self.raedme
+
+    def get_changes(self):
+        return self.changes
+
+    def get_license(self):
+        return self.license
+
+    def get_participants(self):
+        return self.participants
+
+    def get_samples(self):
+        return self.samples
 
     def get_dataset_overview(self):
         return self.dataset_overview
