@@ -3,11 +3,7 @@ import json
 import csv
 
 
-class NothingFoundError(Exception):
-    pass
-
-
-def prepare_file(file):
+def prepare_file(file, *pattern):
     if "sub-" in file.name:
         splitted_name = file.name.split("_")
         name = "_".join(splitted_name[1:])
@@ -34,65 +30,15 @@ def get_path(pattern, path=None):
         if cwd == path and len(localized_path) == 0:
             os.chdir("..")
             if cwd == os.getcwd():
-                raise NothingFoundError
+                print(f"No dataset {pattern} found")
+                exit(1)
             else:
                 cwd = os.getcwd()
             localized_path = get_path(pattern, os.getcwd())
     except PermissionError:
         pass
-    except NothingFoundError:
-        print("No dataset found")
     finally:
         return localized_path
-
-
-def merge(dictionary_, list_, merged_dictionary):
-    for item in list_:
-        for entry in dictionary_:
-            if entry.startswith(item):
-                if item not in merged_dictionary.keys():
-                    merged_dictionary[item] = {"count": 1, "content": {}}
-                else:
-                    merged_dictionary[item]["count"] += 1
-                if len(dictionary_[entry]) > 0:
-                    sub_list = []
-                    for sub_entry in dictionary_[entry]:
-                        sub_list.append(sub_entry)
-                    merged_dictionary[item]["content"] = \
-                        merge(dictionary_[entry], sub_list, merged_dictionary[item]["content"])
-
-    return merged_dictionary
-
-
-def shrink(dictionary):
-    dir_list1 = list(dictionary.keys())
-    dir_list2 = dir_list1.copy()
-    shrunk = []
-    for dir1 in dir_list1:
-        tmp_dir_name = ""
-        for dir2 in dir_list2:
-            for x in range(2, min(len(dir1), len(dir2)) + 1):
-                if dir1[:x] == dir2[:x]:
-                    tmp_dir_name = dir1[:x]
-        b = False
-        for entry in shrunk:
-            if tmp_dir_name.startswith(entry):
-                b = True
-                break
-            elif entry.startswith(tmp_dir_name):
-                shrunk.pop(shrunk.index(entry))
-                shrunk.append(tmp_dir_name)
-                b = True
-                break
-        if tmp_dir_name not in shrunk and not b:
-            shrunk.append(tmp_dir_name)
-
-    if len(dictionary) == len(shrunk):
-        return dictionary
-    else:
-        shrunk_dict = {}
-        shrunk_dict = merge(dictionary, shrunk, shrunk_dict)
-        return shrunk_dict
 
 
 def get_json(path, pattern):
@@ -144,3 +90,12 @@ def get_txt(path, *pattern):
                 pass
     if content is None:
         return content
+
+
+def sort_dict(dictionary):
+    sorted_dictionary = {}
+    keys = dictionary.keys()
+    keys = sorted(keys)
+    for key in keys:
+        sorted_dictionary[key] = dictionary[key]
+    return sorted_dictionary

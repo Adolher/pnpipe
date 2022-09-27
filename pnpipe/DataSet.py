@@ -6,89 +6,103 @@ import utils
 class Dataset:
     def __init__(self, pattern):
         self.dataset_path = utils.get_path(pattern)
+        if self.dataset_path == "":
+            exit()
         self.dataset_description = utils.get_json(self.dataset_path, "dataset_description")
         self.raedme = utils.get_txt(self.dataset_path, "readme", "Readme", "README")
         self.changes = utils.get_txt(self.dataset_path, "changes", "Changes", "CHANGES")
         self.license = utils.get_txt(self.dataset_path, "license", "License", "LICENSE")
-        self.participants = utils.get_tsv_or_json(self.dataset_path, "participants")
-        self.samples_tsv = utils.get_tsv(self.dataset_path, "samples")      # ToDo: merge samples in 1 dict
+        self.participants = utils.sort_dict(utils.get_tsv_or_json(self.dataset_path, "participants"))
+        self.samples_tsv = utils.get_tsv(self.dataset_path, "samples")  # ToDo: merge samples in 1 dict
         self.samples_json = utils.get_json(self.dataset_path, "samples")
-        self.subjects = None
+        self.subjects = self.__read_subjects()
 
         self.is_bids = False
 
-        self.not_to_shrink = ["ses-", ]
-        self.dataset_overview, self.full_dataset = \
-            self._prepare_dataset_overview(os.scandir(self.dataset_path), {}, {})
-
-    def get_dataset_path(self):
+    def get_dataset_path(self) -> str:
         return self.dataset_path
 
-    def get_dataset_description(self):
+    def get_dataset_description(self) -> dict:
         return self.dataset_description
 
-    def get_readme(self):
+    def get_readme(self) -> str:
         return self.raedme
 
-    def get_changes(self):
+    def get_changes(self) -> str:
         return self.changes
 
-    def get_license(self):
+    def get_license(self) -> str:
         return self.license
 
-    def get_participants(self):
+    def get_participants(self) -> dict:
         return self.participants
 
     def get_samples(self):
-        return self.samples
+        return self.samples_tsv, self.samples_json
 
-    def get_dataset_overview(self):
-        return self.dataset_overview
+    def __read_subjects(self):
+        tmp_subjects = {}
+        for participant in self.participants:
+            path = os.path.join(self.dataset_path, participant)
+            tmp_subjects[participant] = Subject(path, participant, self.participants[participant])
+        return tmp_subjects
 
-    def print_dataset_overview(self, exclude):
-        def print_entry(dictionary, c):
-            msg = "{}{:<4}x {}"
-            for data in dictionary:
-                if len(dictionary[data]["content"]) == 0:
-                    if not data.endswith(exclude):
-                        print(msg.format(c * "  ", dictionary[data]["count"], data))
-                else:
-                    if not data.endswith(exclude):
-                        print(msg.format(c * "  ", dictionary[data]["count"], data))
-                    print_entry(dictionary[data]["content"], c+1)
-        print_entry(self.dataset_overview, 0)
+    def get_subject_str(self, subject_id) -> str:
+        return self.subjects[subject_id].__str__()
 
-    def get_full_dataset(self):
-        return self.full_dataset
+    def get_subject_obj(self, subject_id) -> object:
+        return self.subjects[subject_id].__repr__()
 
-    def print_full_dataset(self):
-        pass
-
-    def _prepare_dataset_overview(self, content, overview_dict, full_dict):
-        is_dir = 0
-        to_shrink = False
-        for c in content:
-            if c.is_file():
-                name, value = utils.prepare_file(c)
-                overview_dict.update({name: {}})
-                full_dict.update({c.name: value})
-            elif c.is_dir():
-                overview_dict[c.name] = {}
-                full_dict[c.name] = {}
-                overview_dict[c.name], full_dict[c.name] = \
-                    self._prepare_dataset_overview(os.scandir(c.path), overview_dict[c.name], full_dict[c.name])
-                to_shrink = True
-                for clause in self.not_to_shrink:
-                    if c.name.startswith(clause):
-                        to_shrink = False
-                is_dir += 1
-        if is_dir >= 2 and to_shrink:
-            x = utils.shrink(overview_dict)
-        else:
-            x = overview_dict
-        return x, full_dict
+    def get_subjects(self):
+        return self.subjects
 
 
 class Subject:
-    def __init__(self):
+    def __init__(self, path, subject_id, attributes):
+        self.subject_path = path
+        self.subject_id = subject_id
+        self.subject_attributes = attributes
+        self.sessions = self.__read_sessions()
+
         self.is_bids = False
+
+    def __str__(self):
+        msg = """
+        Participant ID: {}
+        Path:           {}
+        Attributes:     {}
+        BIDS:           {}"""
+        return msg.format(self.subject_id, self.subject_path, self.subject_attributes, self.is_bids)
+
+    def get_subject_path(self):
+        return self.subject_path
+
+    def get_subject_id(self):
+        return self.subject_id
+
+    def get_subject_attributes(self):
+        return self.subject_attributes
+
+    def get_sessions(self):
+        return self.sessions
+
+    def __read_sessions(self):
+        has_sessions = False
+        sessions = {}
+        content = os.listdir(self.subject_path)
+        for i in content:
+            if i.startswith("ses-"):
+                has_sessions = True
+                sessions[i] = self.read_session(os.path.join(self.subject_path, i))
+        if has_sessions:
+            return sessions
+        else:
+            sessions["ses-01"] = self.read_session(self.subject_path)
+            return sessions
+
+    def read_session(self, path):
+        ses_directories = {}
+        content = os.listdir(path)
+        for i in content:
+            ses_directories[i] = os.listdir(os.path.join(path, i))
+        return ses_directories
