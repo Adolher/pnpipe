@@ -3,4 +3,5 @@
 *.autosave
 __pycache__/
 *.pyc
-later\ntest.py
+later
+test.py
