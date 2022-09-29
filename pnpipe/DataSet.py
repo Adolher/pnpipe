@@ -4,8 +4,13 @@ import utils
 
 
 class Dataset:
-    def __init__(self, pattern):
-        self.dataset_path = utils.get_path(pattern)
+    def __init__(self, **kwargs):
+        if "dataset_json" in kwargs.keys():
+            pass    # ToDo: read dataset from <Dataset-name>.json
+        elif len(kwargs.keys()) == 1 and "path" in kwargs.keys():
+            self.dataset_path = kwargs["path"]
+        else:
+            self.dataset_path = utils.get_path(kwargs)
         if self.dataset_path == "":
             exit()
         self.dataset_description = utils.get_json(self.dataset_path, "dataset_description")
