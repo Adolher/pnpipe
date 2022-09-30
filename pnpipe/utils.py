@@ -1,22 +1,9 @@
 import os
 import json
 import csv
-import sys
 
 
-def get_path(kwargs):
-    cwd = os.getcwd()
-    path_list = []
-    visited = []
-    set_path = False
-    if "path" not in kwargs.keys():
-        start = cwd
-    else:
-        start = kwargs["path"]
-        set_path = True
-    pattern = None if "pattern" not in kwargs.keys() else kwargs["pattern"]
-    os.chdir(start)
-
+def get_dataset_path(kwargs):
     def search(path):
         nonlocal cwd
         nonlocal start
@@ -40,14 +27,27 @@ def get_path(kwargs):
         except PermissionError:
             pass
 
-    search(start)
-    if len(path_list) == 1:
-        return path_list[0]
-    elif len(path_list) == 0:
-        sys.exit("Found no object with pattern \"" + pattern + "\"!")
+    path_list = []
+    if "dataset_json" in kwargs.keys():
+        # ToDo: name of dataset-directory or dataset_description["name"] ?
+        # ToDo: read dataset from <Dataset-name>.json
+        pass
+    elif len(kwargs.keys()) == 1 and "path" in kwargs.keys():
+        path_list.append(kwargs["path"])
     else:
-        sys.exit("Found more than 1 object with pattern \"" + pattern + "\"! Please specify your search!")
-    # ToDo: exit() with number and catch it later
+        cwd = os.getcwd()
+        visited = []
+        set_path = False
+        if "path" not in kwargs.keys():
+            start = cwd
+        else:
+            start = kwargs["path"]
+            set_path = True
+        pattern = None if "pattern" not in kwargs.keys() else kwargs["pattern"]
+        os.chdir(start)
+
+        search(start)
+    return path_list
 
 
 def get_json(path, pattern):
@@ -58,7 +58,7 @@ def get_json(path, pattern):
             content = json.load(json_file)
             return content
     except FileNotFoundError:
-        return
+        return None
 
 
 def get_tsv(path, pattern):
@@ -73,7 +73,7 @@ def get_tsv(path, pattern):
                 content[x.pop(keys[0])] = x
             return content
     except FileNotFoundError:
-        return
+        return None
 
 
 def get_tsv_or_json(path, pattern):
@@ -102,9 +102,12 @@ def get_txt(path, *pattern):
 
 
 def sort_dict(dictionary):
-    sorted_dictionary = {}
-    keys = dictionary.keys()
-    keys = sorted(keys)
-    for key in keys:
-        sorted_dictionary[key] = dictionary[key]
-    return sorted_dictionary
+    if dictionary is not None:
+        sorted_dictionary = {}
+        keys = dictionary.keys()
+        keys = sorted(keys)
+        for key in keys:
+            sorted_dictionary[key] = dictionary[key]
+        return sorted_dictionary
+    else:
+        return None
