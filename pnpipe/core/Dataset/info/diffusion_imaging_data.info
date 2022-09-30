@@ -1,0 +1,16 @@
+sub-<label>/
+    [ses-<label>/]
+        dwi/
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>]_dwi.bval
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>]_dwi.bvec
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>]_dwi.json
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>]_dwi.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>]_sbref.json
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>]_sbref.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>][_recording-<label>]_physio.json
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>][_recording-<label>]_physio.tsv.gz
+
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>][_recording-<label>]_stim.json
+            sub-<label>[_ses-<label>][_acq-<label>][_dir-<label>][_run-<index>][_part-<mag|phase|real|imag>][_recording-<label>]_stim.tsv.gz

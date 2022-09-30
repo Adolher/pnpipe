@@ -1,0 +1,35 @@
+sub-<label>/
+    [ses-<label>/]
+        anat/
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_part-<mag|phase|real|imag>]_<suffix>.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_part-<mag|phase|real|imag>]_<suffix>.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_<suffix>.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_<suffix>.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_mod-<label>]_defacemask.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_mod-<label>]_defacemask.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_echo-<index>[_part-<mag|phase|real|imag>]_MEGRE.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_echo-<index>[_part-<mag|phase|real|imag>]_MEGRE.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_echo-<index>[_part-<mag|phase|real|imag>]_MESE.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_echo-<index>[_part-<mag|phase|real|imag>]_MESE.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>]_flip-<index>[_part-<mag|phase|real|imag>]_VFA.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>]_flip-<index>[_part-<mag|phase|real|imag>]_VFA.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_inv-<index>[_part-<mag|phase|real|imag>]_IRT1.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_inv-<index>[_part-<mag|phase|real|imag>]_IRT1.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>][_flip-<index>]_inv-<index>[_part-<mag|phase|real|imag>]_MP2RAGE.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>][_flip-<index>]_inv-<index>[_part-<mag|phase|real|imag>]_MP2RAGE.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>]_flip-<index>_mt-<on|off>[_part-<mag|phase|real|imag>]_MPM.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>]_flip-<index>_mt-<on|off>[_part-<mag|phase|real|imag>]_MPM.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>]_flip-<index>_mt-<on|off>[_part-<mag|phase|real|imag>]_MTS.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>][_echo-<index>]_flip-<index>_mt-<on|off>[_part-<mag|phase|real|imag>]_MTS.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_mt-<on|off>[_part-<mag|phase|real|imag>]_MTR.json
+            sub-<label>[_ses-<label>][_acq-<label>][_ce-<label>][_rec-<label>][_run-<index>]_mt-<on|off>[_part-<mag|phase|real|imag>]_MTR.nii[.gz]

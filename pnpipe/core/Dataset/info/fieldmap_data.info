@@ -1,0 +1,42 @@
+
+
+# Phase-difference map and at least one magnitude image
+sub-<label>/
+    [ses-<label>/]
+        fmap/
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phasediff.nii[.gz]
+
+
+# Two phase maps and two magnitude images
+sub-<label>/
+    [ses-<label>/]
+        fmap/
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude1.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude2.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase1.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_phase2.nii[.gz]
+
+
+# Direct field mapping
+sub-<label>/
+    [ses-<label>/]
+        fmap/
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_fieldmap.nii[.gz]
+
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude.json
+            sub-<label>[_ses-<label>][_acq-<label>][_run-<index>]_magnitude.nii[.gz]
