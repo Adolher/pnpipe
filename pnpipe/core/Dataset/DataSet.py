@@ -5,6 +5,50 @@ from .Subject import Subject
 from .dataset_utils import Utils
 
 
+class NotSpecificError(Exception):
+    def __init__(self, path, kwargs):
+        self.path = ""
+        for p in path:
+            self.path += "\t" + p + "\n"
+        self.kwargs_str = ""
+        for kwarg in kwargs.keys():
+            self.kwargs_str += "\t" + kwarg + " = " + kwargs[kwarg] + "\n"
+        self.msg = "Found \n{} with \n{}\nPlease specify your search!"
+
+    def __str__(self):
+        return self.msg.format(self.path, self.kwargs_str)
+
+
+class NoDatasetFoundError(Exception):
+    def __init__(self, kwargs):
+        if type(kwargs) == dict:
+            self.kwargs_str = "with \""
+            for kwarg in kwargs.keys():
+                self.kwargs_str += kwarg + " = " + kwargs[kwarg]
+        elif type(kwargs) == str:
+            self.kwargs_str = "in \"" + kwargs
+        self.msg = "Found no Dataset {}\"!"
+
+    def __str__(self):
+        return self.msg.format(self.kwargs_str)
+
+
+class PathDoesNotExistError(Exception):
+    def __init__(self, path):
+        self.msg = "path = \"" + str(path) + "\" does not exist!"
+
+    def __str__(self):
+        return self.msg
+
+
+class ArgsFailError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
+
+
 class Dataset:
     def __init__(self, **kwargs):
         self.arguments_msg = \
@@ -31,51 +75,44 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
                     # if nothing found: sys.exit()
                     # if >1 found: sys.exit()
         """
-
-        self.dataset_path = self.__set_dataset_path(kwargs)
+        self.__dataset_path = self.__set_dataset_path(kwargs)
         self.dataset_description = self.__read_dataset_description()
-        self.readme = Utils.get_txt(self.dataset_path, "readme", "Readme", "README")
-        self.changes = Utils.get_txt(self.dataset_path, "changes", "Changes", "CHANGES")
-        self.license = Utils.get_txt(self.dataset_path, "license", "License", "LICENSE")
-        self.participants = Utils.sort_dict(Utils.get_tsv_or_json(self.dataset_path, "participants"))
-        self.samples_tsv = Utils.get_tsv(self.dataset_path, "samples")  # ToDo: merge samples in 1 dict
-        self.samples_json = Utils.get_json(self.dataset_path, "samples")
+        self.readme = Utils.get_txt(self.__dataset_path, "readme", "Readme", "README")
+        self.changes = Utils.get_txt(self.__dataset_path, "changes", "Changes", "CHANGES")
+        self.license = Utils.get_txt(self.__dataset_path, "license", "License", "LICENSE")
+        self.participants = Utils.sort_dict(Utils.get_tsv_or_json(self.__dataset_path, "participants"))
+        self.samples_tsv = Utils.get_tsv(self.__dataset_path, "samples")  # ToDo: merge samples in 1 dict
+        self.samples_json = Utils.get_json(self.__dataset_path, "samples")
 
         self.subjects = self.__read_subjects()
 
         self.is_bids = False
 
-    def __set_dataset_path(self, kwargs):
-        if len(kwargs) == 0:
-            sys.exit(self.arguments_msg)
-            # ToDo: exit() with number and catch it in UI
+    @property
+    def dataset_path(self) -> str:
+        return self.__dataset_path
+
+    def __set_dataset_path(self, kwargs) -> str:
+        if len(kwargs) < 1 or len(kwargs) > 2:
+            raise ArgsFailError(self.arguments_msg)
         else:
-            paths = Utils.get_dataset_path(kwargs)
+            paths = Utils.scan_for_dataset_path(kwargs)
         if len(paths) == 1:
             if os.path.exists(paths[0]):
                 return paths[0]
             else:
-                sys.exit("path = \"" + str(paths[0]) + "\" does not exist!")
-                # ToDo: exit() with number and catch it in UI
+                raise PathDoesNotExistError(str(paths[0]))
         else:
-            kwargs_str = "\n"
-            for kwarg in kwargs.keys():
-                kwargs_str += "\t" + kwarg + " = " + kwargs[kwarg] + "\n"
             if len(paths) == 0:
-                sys.exit("Found no object with \"" + str(kwargs) + "\"!")
-                # ToDo: exit() with number and catch it in UI
+                raise NoDatasetFoundError(kwargs)
             else:
-                paths_string = "\n"
-                for p in paths:
-                    paths_string += "\t" + p + "\n"
-                sys.exit("Found " + paths_string + " with" + kwargs_str + "\nPlease specify your search!")
-                # ToDo: exit() with number and catch it in UI
+                raise NotSpecificError(paths, kwargs)
 
     def __read_dataset_description(self):
-        dataset_description = Utils.get_json(self.dataset_path, "dataset_description")
+        dataset_description = Utils.get_json(self.__dataset_path, "dataset_description")
         if dataset_description is None:
-            sys.exit("In " + self.dataset_path + " is no Dataset!\nMISSING:\n\t'dataset_description.json")
-            # ToDo: exit() with number and catch it in UI
+            msg = self.__dataset_path + "\nMISSING:\n\t'dataset_description.json"
+            raise NoDatasetFoundError(msg)
         else:
             return dataset_description
 
@@ -85,14 +122,11 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
         tmp_subjects = {}
         if self.participants is not None:
             for participant in self.participants:
-                path = os.path.join(self.dataset_path, participant)
+                path = os.path.join(self.__dataset_path, participant)
                 tmp_subjects[participant] = Subject(path, participant, self.participants[participant])
             return tmp_subjects
         else:
             return None
-
-    def get_dataset_path(self) -> str:
-        return self.dataset_path
 
     def get_dataset_description(self) -> dict:
         return self.dataset_description

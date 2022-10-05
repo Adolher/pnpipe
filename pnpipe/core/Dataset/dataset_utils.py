@@ -5,7 +5,7 @@ import csv
 
 class Utils:
     @staticmethod
-    def get_dataset_path(kwargs):
+    def scan_for_dataset_path(kwargs):
         def search(path):
             nonlocal cwd
             nonlocal start
@@ -15,7 +15,7 @@ class Utils:
             try:
                 ds = os.scandir(path)
                 for d in ds:
-                    if pattern in d.name and d.path not in path_list:
+                    if pattern in d.name and d.is_dir():
                         path_list.append(d.path)
                     elif d.is_dir() and d.path not in visited and not d.name.startswith("."):
                         search(d.path)  # ToDo: don't search visited directories
@@ -23,7 +23,7 @@ class Utils:
                     if os.getcwd() == "/" or os.getcwd().endswith(":\\"):
                         return
                     else:
-                        os.chdir("../../..")
+                        os.chdir("..")
                         start = os.getcwd()
                         search(start)
             except PermissionError:
