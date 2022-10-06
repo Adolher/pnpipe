@@ -121,6 +121,10 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
     def subjects(self):
         return self.__subjects
 
+    @property
+    def is_bids(self):
+        return self.is_bids
+
     def __set_dataset_path(self, kwargs) -> str:
         if len(kwargs) < 1 or len(kwargs) > 2:
             raise ArgsFailError(self.__arguments_msg)
@@ -164,7 +168,10 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
         BIDS-Version ( from dataset-description.json )
         """
         ds_dir_name = self.dataset_path.split(os.sep)[-1]
-        obj_to_save = [self.dataset_path, ds_dir_name, self.dataset_description["Name"], self.dataset_description["BIDSVersion"]]
+        obj_to_save = [self.dataset_path, ds_dir_name,
+                       self.dataset_description["Name"],
+                       self.dataset_description["BIDSVersion"],
+                       ]
 
         saved_datasets = Utils.read_saved_datasets()
         if saved_datasets is not None:

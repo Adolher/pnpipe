@@ -3,12 +3,12 @@ import os
 
 class Subject:
     def __init__(self, path, subject_id, attributes):
-        self.subject_path = path
-        self.subject_id = subject_id
-        self.subject_attributes = attributes
-        self.sessions = self.__read_sessions()
+        self.__subject_path = path
+        self.__subject_id = subject_id
+        self.__subject_attributes = attributes
+        self.__sessions = self.__read_sessions()
 
-        self.is_bids = False
+        self.__is_bids = False
 
     def __str__(self):
         msg = """
@@ -18,20 +18,25 @@ class Subject:
         BIDS:           {}"""
         return msg.format(self.subject_id, self.subject_path, self.subject_attributes, self.is_bids)
 
-    def get_subject_path(self):
-        return self.subject_path
+    @property
+    def subject_path(self):
+        return self.__subject_path
 
-    def get_subject_id(self):
-        return self.subject_id
+    @property
+    def subject_id(self):
+        return self.__subject_id
 
-    def get_subject_attributes(self):
-        return self.subject_attributes
+    @property
+    def subject_attributes(self):
+        return self.__subject_attributes
 
-    def get_sessions(self):
-        return self.sessions
+    @property
+    def sessions(self):
+        return self.__sessions
 
-    def get_subject_obj(self) -> object:    # ToDo: is it necessary?
-        return self.__repr__()
+    @property
+    def is_bids(self):
+        return self.__is_bids
 
     def __read_sessions(self):
         has_sessions = False
