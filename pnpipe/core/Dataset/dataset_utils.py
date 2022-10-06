@@ -30,10 +30,16 @@ class Utils:
                 pass
 
         path_list = []
-        if "dataset_json" in kwargs.keys():
-            # ToDo: name of dataset-directory or dataset_description["name"] ?
-            # ToDo: read dataset from <Dataset-name>.json
-            pass
+        if "saved_dataset" in kwargs.keys():
+            searched_dataset = kwargs["saved_dataset"]
+            saved_datasets = Utils.read_saved_datasets()
+            if saved_datasets is not None:
+                for saved_dataset in saved_datasets:
+                    if searched_dataset.lower() in saved_dataset[1].lower()\
+                            or searched_dataset.lower() in saved_dataset[2].lower():
+                        path_list.append(saved_dataset[0])
+            else:
+                path_list = Utils.scan_for_dataset_path({"pattern":searched_dataset})
         elif len(kwargs.keys()) == 1 and "path" in kwargs.keys():
             path_list.append(kwargs["path"])
         else:
@@ -52,6 +58,13 @@ class Utils:
         return path_list
 
     @staticmethod
+    def read_saved_datasets():
+        path = os.sep.join(os.path.realpath(os.path.dirname(__file__)).split(os.sep)[:-2])
+        pattern = "Datasets.tsv"
+        ds_list = Utils.get_tsv(path, pattern, "list")
+        return ds_list
+
+    @staticmethod
     def get_json(path, pattern):
         if not pattern.endswith(".json"):
             pattern += ".json"
@@ -63,23 +76,31 @@ class Utils:
             return None
 
     @staticmethod
-    def get_tsv(path, pattern):
+    def get_tsv(path, pattern, out):
         content = {}
         if not pattern.endswith(".tsv"):
             pattern += ".tsv"
         try:
-            with open(os.path.join(path, pattern)) as tsv_file:
-                y = csv.DictReader(tsv_file, delimiter="\t")
-                for x in y:
-                    keys = list(x.keys())
-                    content[x.pop(keys[0])] = x
-                return content
+            if out == "dict":
+                with open(os.path.join(path, pattern)) as tsv_file:
+                    y = csv.DictReader(tsv_file, delimiter="\t")
+                    for x in y:
+                        keys = list(x.keys())
+                        content[x.pop(keys[0])] = x
+                    return content
+            elif out == "list":
+                with open(os.path.join(path, pattern), mode="r") as ds:
+                    dataset_list = []
+                    ds_reader = csv.reader(ds, delimiter="\t")
+                    for row in ds_reader:
+                        dataset_list.append(row)
+                return dataset_list
         except FileNotFoundError:
             return None
 
     @staticmethod
-    def get_tsv_or_json(path, pattern):
-        content = Utils.get_tsv(path, pattern) if os.path.exists(os.path.join(path, pattern + ".tsv")) \
+    def get_tsv_or_json(path, pattern, out):
+        content = Utils.get_tsv(path, pattern, out) if os.path.exists(os.path.join(path, pattern + ".tsv")) \
             else Utils.get_json(path, pattern + ".json")
         return content
 

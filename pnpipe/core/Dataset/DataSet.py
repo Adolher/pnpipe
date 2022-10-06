@@ -1,5 +1,5 @@
 import os
-import sys
+import csv
 
 from .Subject import Subject
 from .dataset_utils import Utils
@@ -51,12 +51,12 @@ class ArgsFailError(Exception):
 
 class Dataset:
     def __init__(self, **kwargs):
-        self.arguments_msg = \
+        self.__arguments_msg = \
             """
 To initialize an Object of Dataset(), the following arguments MUST be specified:
 
         EITHER:
-            dataset = Dataset(dataset_json="<dataset name>.json")
+            dataset = Dataset(saved_dataset="pattern")
         OR:
             EITHER:
                 dataset = Dataset(path="x:\\path\\to\\dataset-directory-name")  (Windows)
@@ -76,25 +76,54 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
                     # if >1 found: sys.exit()
         """
         self.__dataset_path = self.__set_dataset_path(kwargs)
-        self.dataset_description = self.__read_dataset_description()
-        self.readme = Utils.get_txt(self.__dataset_path, "readme", "Readme", "README")
-        self.changes = Utils.get_txt(self.__dataset_path, "changes", "Changes", "CHANGES")
-        self.license = Utils.get_txt(self.__dataset_path, "license", "License", "LICENSE")
-        self.participants = Utils.sort_dict(Utils.get_tsv_or_json(self.__dataset_path, "participants"))
-        self.samples_tsv = Utils.get_tsv(self.__dataset_path, "samples")  # ToDo: merge samples in 1 dict
-        self.samples_json = Utils.get_json(self.__dataset_path, "samples")
+        self.__dataset_description = self.__read_dataset_description()
+        self.__save_dataset()
+        self.__readme = Utils.get_txt(self.dataset_path, "readme", "Readme", "README")
+        self.__changes = Utils.get_txt(self.dataset_path, "changes", "Changes", "CHANGES")
+        self.__license = Utils.get_txt(self.dataset_path, "license", "License", "LICENSE")
+        self.__participants = Utils.sort_dict(Utils.get_tsv_or_json(self.dataset_path, "participants", "dict"))
+        self.__samples_tsv = Utils.get_tsv(self.dataset_path, "samples", "dict")  # ToDo: merge samples in 1 dict
+        self.__samples_json = Utils.get_json(self.dataset_path, "samples")
 
-        self.subjects = self.__read_subjects()
+        self.__subjects = self.__read_subjects()
 
-        self.is_bids = False
+        self.__is_bids = False
 
     @property
     def dataset_path(self) -> str:
         return self.__dataset_path
 
+    @property
+    def dataset_description(self) -> dict:
+        return self.__dataset_description
+
+    @property
+    def readme(self) -> str:
+        return self.__readme
+
+    @property
+    def changes(self) -> str:
+        return self.__changes
+
+    @property
+    def license(self) -> str:
+        return self.__license
+
+    @property
+    def participants(self) -> dict:
+        return self.__participants
+
+    @property
+    def samples(self):
+        return self.__samples_tsv, self.__samples_json
+
+    @property
+    def subjects(self):
+        return self.__subjects
+
     def __set_dataset_path(self, kwargs) -> str:
         if len(kwargs) < 1 or len(kwargs) > 2:
-            raise ArgsFailError(self.arguments_msg)
+            raise ArgsFailError(self.__arguments_msg)
         else:
             paths = Utils.scan_for_dataset_path(kwargs)
         if len(paths) == 1:
@@ -109,9 +138,9 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
                 raise NotSpecificError(paths, kwargs)
 
     def __read_dataset_description(self):
-        dataset_description = Utils.get_json(self.__dataset_path, "dataset_description")
+        dataset_description = Utils.get_json(self.dataset_path, "dataset_description")
         if dataset_description is None:
-            msg = self.__dataset_path + "\nMISSING:\n\t'dataset_description.json"
+            msg = self.dataset_path + "\nMISSING:\n\t'dataset_description.json"
             raise NoDatasetFoundError(msg)
         else:
             return dataset_description
@@ -122,29 +151,28 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
         tmp_subjects = {}
         if self.participants is not None:
             for participant in self.participants:
-                path = os.path.join(self.__dataset_path, participant)
+                path = os.path.join(self.dataset_path, participant)
                 tmp_subjects[participant] = Subject(path, participant, self.participants[participant])
             return tmp_subjects
         else:
             return None
 
-    def get_dataset_description(self) -> dict:
-        return self.dataset_description
+    def __save_dataset(self) -> None:
+        """
+        Directory-Path,
+        Dataset-Name ( from dataset-description.json )
+        BIDS-Version ( from dataset-description.json )
+        """
+        ds_dir_name = self.dataset_path.split(os.sep)[-1]
+        obj_to_save = [self.dataset_path, ds_dir_name, self.dataset_description["Name"], self.dataset_description["BIDSVersion"]]
 
-    def get_readme(self) -> str:
-        return self.readme
+        saved_datasets = Utils.read_saved_datasets()
+        if saved_datasets is not None:
+            for saved_dataset in saved_datasets:
+                if obj_to_save == saved_dataset:
+                    return
 
-    def get_changes(self) -> str:
-        return self.changes
-
-    def get_license(self) -> str:
-        return self.license
-
-    def get_participants(self) -> dict:
-        return self.participants
-
-    def get_samples(self):
-        return self.samples_tsv, self.samples_json
-
-    def get_subjects(self):
-        return self.subjects
+        path = os.path.join(os.sep.join(os.path.realpath(os.path.dirname(__file__)).split(os.sep)[:-2]), "Datasets.tsv")
+        with open(path, mode="a", newline="") as ds:
+            ds_writer = csv.writer(ds, delimiter="\t")
+            ds_writer.writerow(obj_to_save)

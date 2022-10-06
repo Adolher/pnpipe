@@ -1,9 +1,12 @@
-import json
+import json, os
 
 from core.Dataset.DataSet import Dataset
+from core.Dataset.dataset_utils import Utils
 
-dataset = Dataset(pattern="ds000221")
+dataset = Dataset(saved_dataset="221")
 subject = dataset.subjects["sub-010001"]
 
 print(json.dumps(subject.get_sessions(), indent=2))
-print(dataset.dataset_path)
+
+#print(dataset.save_dataset())
+#print(Utils.read_saved_datasets())
