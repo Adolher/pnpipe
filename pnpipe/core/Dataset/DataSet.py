@@ -84,7 +84,7 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
         self.__participants = Utils.sort_dict(Utils.get_tsv_or_json(self.dataset_path, "participants", "dict"))
         self.__samples_tsv = Utils.get_tsv(self.dataset_path, "samples", "dict")  # ToDo: merge samples in 1 dict
         self.__samples_json = Utils.get_json(self.dataset_path, "samples")
-        self.__derivatives_path = None  # ToDo: get path of derivatives, look in BIDS specifications
+        self.__derivatives_path = self.__get_derivatives_path()
 
         self.__subjects = self.__read_subjects()
 
@@ -146,7 +146,7 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
             else:
                 raise NotSpecificError(paths, kwargs)
 
-    def __read_dataset_description(self):
+    def __read_dataset_description(self) -> dict:
         dataset_description = Utils.get_json(self.dataset_path, "dataset_description")
         if dataset_description is None:
             msg = self.dataset_path + "\nMISSING:\n\t'dataset_description.json"
@@ -167,7 +167,11 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
                 if entry.is_dir() and entry.name.startswith("sub-"):
                     participant_id = entry.name.replace("sub-", "")
                     tmp_subjects[participant_id] = Subject(entry.path, participant_id)
-            return tmp_subjects
+            return Utils.sort_dict(tmp_subjects)
+
+    def __get_derivatives_path(self):
+        path = os.path.join(self.dataset_path, "derivatives")
+        return path if os.path.exists(path) else None
 
     def __save_dataset(self) -> None:
         """

@@ -1,10 +1,8 @@
 {
   "micapipe": {
-    "bare": "mica-pipe",
-    "docker": "",
-    "singularity": "<path_to_micapipe_image>",
+    "bare": "mica-pipe ",
     "arguments": "-sub {} -out {} -bids {} ",
-    "optional_arguments": "-ses {}",
+    "optional_arguments": "-ses {} ",
     "commands": {
       "-proc_structural": {
         "command": "-proc_structural",

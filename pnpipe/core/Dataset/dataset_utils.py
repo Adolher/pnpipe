@@ -127,10 +127,14 @@ class Utils:
     def sort_dict(dictionary):
         if dictionary is not None:
             sorted_dictionary = {}
-            keys = dictionary.keys()
-            keys = sorted(keys)
-            for key in keys:
-                sorted_dictionary[key] = dictionary[key]
+            keys = []
+            for key in dictionary.keys():
+                if not key.replace("sub-", "").startswith("0"):
+                    keys.append(int(key))
+                else:
+                    keys.append(key)
+            for key in sorted(keys):
+                sorted_dictionary[str(key)] = dictionary[str(key)]
             return sorted_dictionary
         else:
             return None

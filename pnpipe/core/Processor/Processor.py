@@ -7,7 +7,7 @@ from .Carrier import Carrier
 class Processor:
     def __init__(self, name, carrier) -> None:
         self.__name = name
-        self.carrier = Carrier(carrier)
+        self.__carrier = Carrier(carrier)
         # ToDo: check if program exists
         # if program not exists
         # ToDo: install routine
@@ -18,6 +18,10 @@ class Processor:
     @property
     def name(self) -> str:
         return self.__name
+
+    @property
+    def carrier(self) -> Carrier:
+        return self.__carrier
 
     @property
     def version(self) -> str:
@@ -44,19 +48,29 @@ class Processor:
             self.__command_list.append(command)
         return commands[self.name]
 
-    def run(self, dataset, subject, command, cl=None) -> list[str]:
-        if cl is None:
-            cl = []
-        base = self.commands["arguments"]
+    def run(self, dataset, subject, command, output=None) -> list[str]:
+        if output is None:
+            output = []
+        base = "" if self.carrier.name != "bare" else self.commands["bare"]
+        base += self.carrier.command
+        base += self.commands["arguments"]
+        sessions = subject.sessions.keys()
+        if "None" not in sessions:
+            base += self.commands["optional_arguments"]
         command = self.commands["commands"][command]["command"]
         base += command
 
         if self.commands["commands"][command]["dependencies"] is not None:
             for dependency in self.commands["commands"][command]["dependencies"]:
-                self.run(dataset, subject, dependency)
+                self.run(dataset, subject, dependency, output)
 
-        cl.append(base.format(subject.subject_id, dataset.derivatives_path, dataset.dataset_path))
-        return cl
+        if "None" not in sessions:
+            for ses in sessions:
+                output.append(base.format(subject.subject_id, dataset.derivatives_path,
+                                          dataset.dataset_path, ses.replace("ses-", "")))
+        else:
+            output.append(base.format(subject.subject_id, dataset.derivatives_path, dataset.dataset_path))
+        return output
 
     def __get_command_output(self):
         # ToDo: get output of commands with observing derivatives_directory

@@ -6,7 +6,6 @@ class Subject:
         self.__subject_path = path
         self.__subject_id = subject_id
         self.__subject_attributes = attributes
-        # ToDo: sessions class with filenames as attributes?
         self.__sessions = self.__read_sessions()
 
         self.__is_bids = False
@@ -52,12 +51,12 @@ class Subject:
         if has_sessions:
             return sessions
         else:
-            sessions["ses-01"] = self.__read_session(self.subject_path)
+            sessions["None"] = self.__read_session(self.subject_path)
             return sessions
 
     def __read_session(self, path):
         ses_directories = {}
         content = os.listdir(path)
         for i in content:
-            ses_directories[i] = os.listdir(os.path.join(path, i))
+            ses_directories[i] = os.listdir(os.path.join(path, i))  # ToDo: class Image
         return ses_directories
