@@ -2,10 +2,11 @@ import os
 
 
 class Subject:
-    def __init__(self, path, subject_id, attributes):
+    def __init__(self, path, subject_id, attributes) -> None:
         self.__subject_path = path
-        self.__subject_id = subject_id
+        self.__subject_id = subject_id.replace("sub-", "")
         self.__subject_attributes = attributes
+        # ToDo: sessions class with filenames as attributes?
         self.__sessions = self.__read_sessions()
 
         self.__is_bids = False

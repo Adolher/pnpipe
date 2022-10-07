@@ -1,57 +1,166 @@
 {
   "micapipe": {
-    "pre_bare": "mica-pipe",
+    "bare": "mica-pipe",
+    "docker": "",
+    "singularity": "<path_to_micapipe_image>",
+    "arguments": "-sub {} -out {} -bids {} ",
+    "optional_arguments": "-ses {}",
+    "commands": {
+      "-proc_structural": {
+        "command": "-proc_structural",
+        "arguments": [],
+        "optional_arguments": [
+          "-t1wStr <str>"
+        ],
+        "dependencies": null
+      },
+      "-proc_freesurfer": {
+        "command": "-proc_freesurfer",
+        "arguments": [],
+        "optional_arguments": [
+          "-atlas <str>"
+        ],
+        "dependencies": null
+      },
+      "-post_structural": {
+        "command": "-post_structural",
+        "arguments": [],
+        "optional_arguments": [
+          "-t1wStr <str>",
+          "freesurfer_dir <path>",
+          "-hires"
+        ],
+        "dependencies": [
+          "-proc_structural",
+          "-proc_freesurfer"
+        ]
+      },
+      "-GD": {
+        "command": "-GD",
+        "arguments": [],
+        "optional_arguments": [],
+        "dependencies": [
+          "-post_structural"
+        ]
+      },
+      "-Morphology": {
+        "command": "-Morphology",
+        "arguments": [],
+        "optional_arguments": [],
+        "dependencies": [
+          "-post_structural"
+        ]
+      },
+      "-proc_dwi": {
+        "command": "-proc_dwi",
+        "arguments": [],
+        "optional_arguments": [
+          "-dwi_main <path>",
+          "-dwi_rpe <path>",
+          "-dwi_processed <path>",
+          "-rpe_all",
+          "-regAffine"
+        ],
+        "dependencies": [
+          "-proc_structural"
+        ]
+      },
+      "-SC": {
+        "command": "-SC",
+        "arguments": [],
+        "optional_arguments": [
+          "-tracts <num>",
+          "-keep_tck",
+          "-autoTract"
+        ],
+        "dependencies": [
+          "-proc_dwi"
+        ]
+      },
+      "-proc_rsfmri": {
+        "command": "-proc_rsfmri",
+        "arguments": [],
+        "optional_arguments": [
+          "-mainScanStr <str>",
+          "-fmri_pe <path>",
+          "-fmri_rpe <path>",
+          "-mainScanRun <num>",
+          "-phaseReversalRun <num>",
+          "-topupConfig <path>",
+          "-smoothWithWB",
+          "-regress_WM_CSF",
+          "-GSR",
+          "-noFIX",
+          "-icafixTraining <path>",
+          "-regAffine",
+          "-sesAnat <str>"
+        ],
+        "dependencies": [
+          "-post_structural"
+        ]
+      },
+      "-MPC": {
+        "command": "-MPC",
+        "arguments": [],
+        "optional_arguments": [
+          "-microstructural_img <path>",
+          "-microstructural_lta <path>",
+          "-microstructural_reg <path>"
+        ],
+        "dependencies": [
+          "-post_structural"
+        ]
+      },
+      "-proc_asl": {
+        "command": "-proc_asl",
+        "arguments": [],
+        "optional_arguments": [
+          "-aslScanStr <str>",
+          "-m0ScanStr <str>"
+        ],
+        "dependencies": [
+          "-proc_structural"
+        ]
+      },
+      "-QC_subj": {
+        "command": "-QC_subj",
+        "arguments": [],
+        "optional_arguments": [
+          "-tracts <num>",
+          "-ses <num> or <str>",
+          "-tmpDir <path>"
+        ],
+        "dependencies": []
+      },
+      "-QC": {
+        "base": "-out <outputDirectory>",
+        "command": "-QC",
+        "arguments": [],
+        "optional_arguments": [],
+        "dependencies": []
+      }
+    }
+  },
+  "micapipe_qc": {
+    "pre_bare": "micapipe_qc",
     "pre_docker": "",
-    "pre_singularity": "<path_to_micapipe_image>",
+    "pre_singularity": "<path_to_micapipe_image> micapipe_qc",
     "base": "-sub <sub-id> -out <derivatives_directory> -bids <bids_directory> ",
-    "-proc_structural": {
-      "command": "-proc_structural",
-      "arguments": [],
-      "optional_arguments": [
-        "-t1wStr <str>"
-      ],
-      "depencies": null,
-      "output_dir": "<derivatives_directory>/micapipe/",
-      "outputs": [
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_mask.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_seg.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_pve_0.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_pve_1.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_pve_2.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_pveseg.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_mixeltype.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_5TT.nii.gz",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w_brain_mask.json",
-        "<sub_directory>/anat/<sub>_space-nativepro_t1w.json",
-        "<sub_directory>/anat/first/",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_0.8mm_mode-image_desc-SyN_0GenericAffine.mat",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_0.8mm_mode-image_desc-SyN_1InverseWarp.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_0.8mm_mode-image_desc-SyN_1Warp.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_0.8mm_mode-image_desc-SyN_InverseWarped.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_0.8mm_mode-image_desc-SyN_Warped.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_2mm_mode-image_desc-SyN_0GenericAffine.mat",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_2mm_mode-image_desc-SyN_1InverseWarp.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_2mm_mode-image_desc-SyN_1Warp.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_2mm_mode-image_desc-SyN_InverseWarped.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_from-nativepro_brain_to-MNI152_2mm_mode-image_desc-SyN_Warped.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_t1w_from-run-2_to_run-1_0GenericAffine.mat",
-        "<sub_directory>/anat/xfm/<sub>_t1w_from-run-2_to_run-1_InverseWarped.nii.gz",
-        "<sub_directory>/anat/xfm/<sub>_t1w_from-run-2_to_run-1_Warped.nii.gz"
-      ]
-    },
-    "-proc_freesurfer": {
-      "command": "-proc_freesurfer",
-      "arguments": [],
-      "optional_arguments": [
-        "-t1wStr <str>",
-        "freesurfer_dir <path>",
-        "-hires"
-      ],
-      "depencies": null,
-      "output_dir": "<derivatives_directory>/freesurfer/",
-      "outputs": []
+    "commands": {
+      "-QC_subj": {
+        "command": "-QC_subj",
+        "arguments": [],
+        "optional_arguments": [
+          "-tracts <num>",
+          "-ses <num> or <str>",
+          "-tmpDir <path>",
+          "-h",
+          "-quiet",
+          "-nocleanup",
+          "-version"
+        ],
+        "dependencies": []
+      }
     }
   }
 }

@@ -84,6 +84,7 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
         self.__participants = Utils.sort_dict(Utils.get_tsv_or_json(self.dataset_path, "participants", "dict"))
         self.__samples_tsv = Utils.get_tsv(self.dataset_path, "samples", "dict")  # ToDo: merge samples in 1 dict
         self.__samples_json = Utils.get_json(self.dataset_path, "samples")
+        self.__derivatives_path = None  # ToDo: get path of derivatives, look in BIDS specifications
 
         self.__subjects = self.__read_subjects()
 
@@ -116,6 +117,10 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
     @property
     def samples(self):
         return self.__samples_tsv, self.__samples_json
+
+    @property
+    def derivatives_path(self):
+        return self.__derivatives_path
 
     @property
     def subjects(self):
