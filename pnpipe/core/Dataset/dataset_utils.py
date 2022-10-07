@@ -18,7 +18,7 @@ class Utils:
                     if pattern in d.name and d.is_dir():
                         path_list.append(d.path)
                     elif d.is_dir() and d.path not in visited and not d.name.startswith("."):
-                        search(d.path)  # ToDo: don't search visited directories
+                        search(d.path)
                 if start == path and not set_path:
                     if os.getcwd() == "/" or os.getcwd().endswith(":\\"):
                         return

@@ -44,7 +44,9 @@ class Processor:
             self.__command_list.append(command)
         return commands[self.name]
 
-    def run(self, dataset, subject, command, cl=[]) -> list[str]:
+    def run(self, dataset, subject, command, cl=None) -> list[str]:
+        if cl is None:
+            cl = []
         base = self.commands["arguments"]
         command = self.commands["commands"][command]["command"]
         base += command

@@ -154,17 +154,20 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
         else:
             return dataset_description
 
-    def __read_subjects(self):
-        # ToDo: EITHER read from participants.tsv
-        #       OR read from directories
+    def __read_subjects(self) -> dict:
         tmp_subjects = {}
         if self.participants is not None:
             for participant in self.participants:
                 path = os.path.join(self.dataset_path, participant)
-                tmp_subjects[participant] = Subject(path, participant, self.participants[participant])
+                participant_id = participant.replace("sub-", "")
+                tmp_subjects[participant_id] = Subject(path, participant_id, self.participants[participant])
             return tmp_subjects
         else:
-            return None
+            for entry in os.scandir(self.dataset_path):
+                if entry.is_dir() and entry.name.startswith("sub-"):
+                    participant_id = entry.name.replace("sub-", "")
+                    tmp_subjects[participant_id] = Subject(entry.path, participant_id)
+            return tmp_subjects
 
     def __save_dataset(self) -> None:
         """
