@@ -1,0 +1,10 @@
+{
+  "Singularity": {
+    "path": "/data/pt_02682/micapipe-v0.1.2.simg",
+    "command": "singularity run --cleanenv -B {}:{os.sep}{bids_dataset} -B {}:{os.sep}{derivatives} -B {}:{} -B {}:{} "
+  },
+  "Docker": {
+    "path": "",
+    "command": "docker run --privileged -t --rm -v {}:{} -v {}:{} -v {}:{} -v {}:{} "
+  }
+}

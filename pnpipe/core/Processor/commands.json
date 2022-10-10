@@ -1,7 +1,12 @@
 {
   "micapipe": {
-    "bare": "mica-pipe ",
-    "arguments": "-sub {} -out {} -bids {} ",
+    "bare": {
+      "arguments": "mica-pipe -sub {} -out {} -bids {} "
+    },
+    "singularity": {
+      "arguments": "singularity run --cleanenv -B {}:/bids_dataset -B {}:/derivatives -B {}:/tmp -B {}:/opt/freesurfer-6.0.0/license.txt -sub {} -out /derivatives -bids /bids_dataset "
+    },
+    "freesurfer_license": "",
     "optional_arguments": "-ses {} ",
     "commands": {
       "-proc_structural": {

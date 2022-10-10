@@ -179,7 +179,8 @@ To initialize an Object of Dataset(), the following arguments MUST be specified:
         Dataset-Name ( from dataset-description.json )
         BIDS-Version ( from dataset-description.json )
         """
-        ds_dir_name = self.dataset_path.split(os.sep)[-1]
+
+        ds_dir_name = self.dataset_path.split(os.sep)[-2] if self.dataset_path.endswith(os.sep) else self.dataset_path[-1]
         obj_to_save = [self.dataset_path, ds_dir_name,
                        self.dataset_description["Name"],
                        self.dataset_description["BIDSVersion"],

@@ -2,15 +2,15 @@ import json
 
 from core.Dataset import Dataset, Subject
 from core.Processor import Processor
+from core.Processing import Processing
 
 
 def printj(dictionary):
     print(json.dumps(dictionary, indent=2))
 
+dataset = Dataset(path="/data/pt_02682/MRI_MPILMBB_LEMON/MRI_Raw")
+pro = Processor("micapipe", "singularity")
+run = Processing(dataset, pro, "-proc_structural", "singularity")
 
-dataset = Dataset(path="H:\\Datasets", pattern="ds000")
-subject = dataset.subjects["010003"]
-pro = Processor("micapipe", "bare")
-li = pro.run(dataset, subject, "-proc_rsfmri")
-for lis in li:
-    print(lis)
+for c in run.command_list:
+    print(c)

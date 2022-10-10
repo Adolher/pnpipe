@@ -5,9 +5,9 @@ from .Carrier import Carrier
 
 
 class Processor:
-    def __init__(self, name, carrier) -> None:
+    def __init__(self, name, carrier="bare") -> None:
         self.__name = name
-        self.__carrier = Carrier(carrier)
+        self.__carrier = carrier
         # ToDo: check if program exists
         # if program not exists
         # ToDo: install routine
@@ -18,10 +18,6 @@ class Processor:
     @property
     def name(self) -> str:
         return self.__name
-
-    @property
-    def carrier(self) -> Carrier:
-        return self.__carrier
 
     @property
     def version(self) -> str:
@@ -51,9 +47,8 @@ class Processor:
     def run(self, dataset, subject, command, output=None) -> list[str]:
         if output is None:
             output = []
-        base = "" if self.carrier.name != "bare" else self.commands["bare"]
-        base += self.carrier.command
-        base += self.commands["arguments"]
+        base = ""
+        base += self.commands[self.__carrier]["arguments"]
         sessions = subject.sessions.keys()
         if "None" not in sessions:
             base += self.commands["optional_arguments"]
@@ -64,12 +59,21 @@ class Processor:
             for dependency in self.commands["commands"][command]["dependencies"]:
                 self.run(dataset, subject, dependency, output)
 
-        if "None" not in sessions:
-            for ses in sessions:
-                output.append(base.format(subject.subject_id, dataset.derivatives_path,
-                                          dataset.dataset_path, ses.replace("ses-", "")))
-        else:
-            output.append(base.format(subject.subject_id, dataset.derivatives_path, dataset.dataset_path))
+        if self.__carrier == "bare":
+            if "None" not in sessions:
+                for ses in sessions:
+                    output.append(base.format(subject.subject_id, dataset.derivatives_path,
+                                              dataset.dataset_path, ses.replace("ses-", "")))
+            else:
+                output.append(base.format(subject.subject_id, dataset.derivatives_path, dataset.dataset_path))
+        elif self.__carrier == "singularity":
+            if "None" not in sessions:
+                for ses in sessions:
+                    output.append(base.format(dataset.dataset_path, dataset.derivatives_path, "tmp_dir", subject.subject_id,
+                                              self.commands["freesurfer_license"], ses.replace("ses-", "")))
+            else:
+                output.append(base.format(dataset.dataset_path, dataset.derivatives_path, "tmp_dir",
+                                          self.commands["freesurfer_license"]))
         return output
 
     def __get_command_output(self):
